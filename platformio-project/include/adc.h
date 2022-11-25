@@ -36,21 +36,37 @@
 /* Defines -----------------------------------------------------------*/
 
 /** @brief  */
-#define ADC_voltage_ref_AREF()      ADMUX &= ~((1<<REFS0) | (<<REFS1));
+// ADMUX[7,6] = 00
+#define ADC_voltage_ref_AREF()      ADMUX &= ~((<<REFS1) | (1<<REFS0));
+// ADMUX[7,6] = 01
 #define ADC_voltage_ref_AVCC()      ADMUX &= ~(1<<REFS1); ADMUX |= (1<<REFS0);
-#define ADC_voltage_ref_internal()  ADMUX |= ((1<<REFS0) | (1<<REFS1));
+// ADMUX[7,6] = 11
+#define ADC_voltage_ref_internal()  ADMUX |= ((1<<REFS1) | (1<<REFS0));
 
-#define ADC_channel_0()     ADMUX &= ~((1 << MUX3) | (1 << MUX2) | (1 << MUX1) | (1 << MUX0));
-#define ADC_channel_1()     ADMUX &= ~((1 << MUX3) | (1 << MUX2) | (1 << MUX1)); ADMUX |= (1 << MUX0);
+// ADMUX[3..0] = 0000
+#define ADC_channel_0()     ADMUX &= ~((1<<MUX3) | (1<<MUX2) | (1<<MUX1) | (1<<MUX0));
+// ADMUX[3..0] = 0001
+#define ADC_channel_1()     ADMUX &= ~((1<<MUX3) | (1<<MUX2) | (1<<MUX1)); ADMUX |= (1<<MUX0);
+// defines for other channels optionals
 
-// define for other channels optional
+// ADCSRA[7] = 1
+#define ADC_enable()            ADCSRA |= (1<<ADEN);
+// ADCSRA[6] = 1
+#define ADC_start_conversion()  ADCSRA |= (1<<ADSC);
+// ADCSRA[5] = 1
+#define ADC_auto_trigger_enable()   ADCSRA |= (1<<ADATE);
+// ADCSRA[3] = 1
+#define ADC_interrupt_enable()  ADCSRA |= (1<<ADIE);
+// ADCSRA[2..0] = 111
+#define ADC_prescaler_128()     ADCSRA |= ((1<<ADPS2) | (1<<ADPS1) | (1<<ADPS0));
+// defines for other prescaler values optionals
 
-#define ADC_enable()            ADCSRA |= (1 << ADEN);
-#define ADC_interrupt_enable()  ADCSRA |= (1 << ADIE);
-#define ADC_prescaler_128()     ADCSRA |= ((1 << ADPS0) | (1 << ADPS1) | (1 << ADPS2));
+// ADCSRB[2..0] = 000
+#define ADC_auto_trigger_source_free_running()  ADCSRB &= ~((1<<ADTS2) | (1<<ADTS1) | (1<<ADCS0));
+// ADCSRB[2..0] = 100
+#define ADC_auto_trigger_source_TIM0_OVF()      ADCSRB |= (1<<ADTS2); ADCSRB &= ~((1<<ADTS1) | (1<<ADTS0));
+// ADCSRB[2..0] = 110
+#define ADC_auto_trigger_source_TIM1_OVF()      ADCSRB |= ((1<<ADTS2) | (1<<ADTS1)); ADCSRB &= ~(1<<ADTS0);
 
-// define for other prescaler values optional
-
-#define ADC_start_conversion()  ADCSRA |= (1 << ADSC);
 
 #endif
