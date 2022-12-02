@@ -37,7 +37,7 @@
 
 /** @brief  */
 // ADMUX[7,6] = 00
-#define ADC_voltage_ref_AREF()      ADMUX &= ~((<<REFS1) | (1<<REFS0));
+#define ADC_voltage_ref_AREF()      ADMUX &= ~((1<<REFS1) | (1<<REFS0));
 // ADMUX[7,6] = 01
 #define ADC_voltage_ref_AVCC()      ADMUX &= ~(1<<REFS1); ADMUX |= (1<<REFS0);
 // ADMUX[7,6] = 11
