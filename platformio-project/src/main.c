@@ -6,7 +6,7 @@ PB0: Screen RS
 PB1: Screen Enable
 PB2: 
 PB3: 
-PB4: Software Interrupt PCINT4 => PCI0
+PB4: Software Interrupt pin PCINT4 (interrupt PCINT0)
 PB5: 
 PB6: 
 PB7: 
@@ -22,7 +22,7 @@ PC6:
 PC7:
 
 PORTD:
-PD0: Rotary Encoder Switch
+PD0: Rotary Encoder Switch, pin PCINT16 (ext. interrupt PCINT2)
 PD1: Rotary Encoder DT
 PD2: Rotary Encoder CLK (External Interrupt INT0)
 PD3: Joystick Switch (External Interrupt INT1)
@@ -235,6 +235,21 @@ ISR(TIMER1_OVF_vect){
     //End of case CLOCK
 
     case STOPWATCH:
+      if(blink_flag == 0){
+        lcd_gotoxy(1,1);
+        lcd_puts("  ");
+        lcd_gotoxy(4,1);
+        lcd_puts("  ");
+        lcd_gotoxy(7,1);
+        lcd_puts("  ");
+        blink_flag = 1;
+      }
+      else{
+        display_time(stopwatch_struct.minutes,1,1);
+        display_time(stopwatch_struct.seconds,4,1);
+        display_time(stopwatch_struct.tenths,7,1);
+        blink_flag = 0;
+      }
       break;
     case NONE:
       break;
@@ -362,8 +377,7 @@ ISR(ADC_vect){
 
 ISR(PCINT0_vect){
   // Move the '*' to select between Timer, Stopwatch and Clock
-  // State machine to switch between the 3 modes
-  // If / else statement but could be more efficient ?
+  // State machine
   switch(joystick_direction){
 
     case RIGHT:
@@ -479,69 +493,12 @@ ISR(PCINT0_vect){
       }
       break;
   }
-
-
-  /* if(selection_mode == TIMER){
-    if(joystick_direction == RIGHT){
-      lcd_gotoxy(0,0);
-      lcd_putc(' ');
-      lcd_gotoxy(7,0);
-      lcd_putc('*');
-      selection_mode = CLOCK;
-    }
-    else if(joystick_direction == DOWN){
-      lcd_gotoxy(0,0);
-      lcd_putc(' ');
-      lcd_gotoxy(0,1);
-      lcd_putc('*');
-      selection_mode = STOPWATCH;
-    }
-    uart_puts("timer\n");
-  }
-
-  else if(selection_mode == CLOCK){
-    if(joystick_direction == LEFT){
-      lcd_gotoxy(7,0);
-      lcd_putc(' ');
-      lcd_gotoxy(0,0);
-      lcd_putc('*');
-      selection_mode = TIMER;
-    }
-    else if(joystick_direction == RIGHT){
-      lcd_gotoxy(7,0);
-      lcd_putc(' ');
-      lcd_gotoxy(0,1);
-      lcd_putc('*');
-      selection_mode = STOPWATCH;
-    }
-    uart_puts("clk\n");
-  }
-
-  else if(selection_mode == STOPWATCH){
-    if(joystick_direction == LEFT){
-      lcd_gotoxy(0,1);
-      lcd_putc(' ');
-      lcd_gotoxy(7,0);
-      lcd_putc('*');
-      selection_mode = CLOCK;
-    }
-    else if(joystick_direction == UP){
-      lcd_gotoxy(0,1);
-      lcd_putc(' ');
-      lcd_gotoxy(0,0);
-      lcd_putc('*');
-      selection_mode = TIMER;
-    }
-    uart_puts("stop\n"); 
-  }*/
-  /* itoa(selection_mode,s,10);
-    uart_puts(s);
-    uart_puts("\n");*/
 }
 
 ISR(INT1_vect){
   if(setting_mode == NONE) setting_mode = selection_mode;
   else{
+    // Before switching to selection mode,
     // Re-display all the values in case they were erased by the blinking
     switch(setting_mode){
       case TIMER:
@@ -554,6 +511,9 @@ ISR(INT1_vect){
         display_time(clock_struct.seconds,14,0);
         break;
       case STOPWATCH:
+        display_time(stopwatch_struct.minutes,1,1);
+        display_time(stopwatch_struct.seconds,4,1);
+        display_time(stopwatch_struct.tenths,7,1);
         break;
       case NONE:
         break;
@@ -564,21 +524,94 @@ ISR(INT1_vect){
 
 ISR(INT0_vect){
   uint8_t dt = GPIO_read(&PIND,PD1);
-
-  if(dt == 0) uart_puts("CW\n");
-  else uart_puts("ACW\n");
+  if(setting_mode == TIMER){
+    if(timer_time_value == MINUTES){
+      if(dt == 0){
+        if(timer_struct.minutes > 59) timer_struct.minutes = 0;
+        else timer_struct.minutes++;
+      }
+      else{
+        if(timer_struct.minutes < 1) timer_struct.minutes = 59;
+        else timer_struct.minutes--;
+      }
+    }
+    else if(timer_time_value == SECONDS){
+      if(dt == 0){
+        if(timer_struct.seconds > 59) timer_struct.seconds = 0;
+        else timer_struct.seconds++;
+      }
+      else{
+        if(timer_struct.seconds < 1) timer_struct.seconds = 59;
+        else timer_struct.seconds--;
+      }
+    }
+  }
+  else if(setting_mode == CLOCK){
+    if(clock_time_value == HOURS){
+      if(dt == 0){
+        if(clock_struct.hours > 23) clock_struct.hours = 0;
+        else clock_struct.hours++;
+      }
+      else{
+        if(clock_struct.minutes < 1) clock_struct.minutes = 23;
+        else clock_struct.minutes--;
+      }
+    }
+    else if(clock_time_value == MINUTES){
+      if(dt == 0){
+        if(clock_struct.minutes > 59) clock_struct.minutes = 0;
+        else clock_struct.minutes++;
+      }
+      else{
+        if(clock_struct.minutes < 1) clock_struct.minutes = 59;
+        else clock_struct.minutes--;
+      }
+    }
+    else if(clock_time_value == SECONDS){
+      if(dt == 0){
+        if(clock_struct.seconds > 59) clock_struct.seconds = 0;
+        else clock_struct.seconds++;
+      }
+      else{
+        if(clock_struct.seconds < 1) clock_struct.seconds = 59;
+        else clock_struct.seconds--;
+      }
+    }
+  }
 }
 
 ISR(PCINT2_vect){
   uint8_t data = GPIO_read(&PIND,PD0);
   if(data == 0){
-    if(selection_mode == TIMER){
-      if(timer_state == DEACTIVATED) timer_state = ACTIVATED;
-      else timer_state = DEACTIVATED;
+    if(setting_mode == NONE){
+      if(selection_mode == TIMER){
+        if(timer_state == DEACTIVATED) timer_state = ACTIVATED;
+        else timer_state = DEACTIVATED;
+      }
+      else if(selection_mode == STOPWATCH){
+        if(stopwatch_state == DEACTIVATED) stopwatch_state = ACTIVATED;
+        else stopwatch_state = DEACTIVATED;
+      }
     }
-    else if(selection_mode == STOPWATCH){
-      if(stopwatch_state == DEACTIVATED) stopwatch_state = ACTIVATED;
-      else stopwatch_state = DEACTIVATED;
+    else if(setting_mode == TIMER){
+      // Reset Timer
+      timer_struct.minutes = 0;
+      timer_struct.seconds = 0;
+      timer_struct.tenths = 0;
     }
+    else if(setting_mode == CLOCK){
+      // Reset Clock
+      clock_struct.hours = 0;
+      clock_struct.minutes = 0;
+      clock_struct.seconds = 0;
+      clock_struct.tenths = 0;
+    }
+    else if(setting_mode == STOPWATCH){
+      // Reset Stopwatch
+      stopwatch_struct.minutes = 0;
+      stopwatch_struct.seconds = 0;
+      stopwatch_struct.tenths  = 0;
+    }
+    
   }
 }
