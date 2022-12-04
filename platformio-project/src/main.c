@@ -87,6 +87,11 @@ struct Stopwatch_structure{
   uint8_t tenths;
 }stopwatch_struct;
 
+void erase_time(uint8_t x, uint8_t y){
+  lcd_gotoxy(x,y);
+  lcd_puts("  ");
+}
+
 void display_time(uint8_t value, uint8_t x, uint8_t y){
   char string[2];
   if(value <= 9){
@@ -96,6 +101,16 @@ void display_time(uint8_t value, uint8_t x, uint8_t y){
   else itoa(value, string, 10);
   lcd_gotoxy(x,y);
   lcd_puts(string);
+}
+
+void erase_selector(uint8_t x, uint8_t y){
+  lcd_gotoxy(x,y);
+  lcd_putc(' ');
+}
+
+void display_selector(uint8_t x, uint8_t y){
+  lcd_gotoxy(x,y);
+  lcd_putc('*');
 }
 
 int main(){
@@ -173,8 +188,7 @@ ISR(TIMER1_OVF_vect){
             break;
           case MINUTES:
             if(blink_flag == 0){
-              lcd_gotoxy(1,0);
-              lcd_puts("  ");
+              erase_time(1,0);
               blink_flag = 1;
             }
             else{
@@ -184,8 +198,7 @@ ISR(TIMER1_OVF_vect){
             break;
           case SECONDS:
             if(blink_flag ==0){
-              lcd_gotoxy(4,0);
-              lcd_puts("  ");
+              erase_time(4,0);
               blink_flag = 1;
             }
             else{
@@ -201,8 +214,7 @@ ISR(TIMER1_OVF_vect){
         switch(clock_time_value){
           case HOURS:
             if(blink_flag == 0){
-              lcd_gotoxy(8,0);
-              lcd_puts("  ");
+              erase_time(8,0);
               blink_flag = 1;
             }
             else{
@@ -212,8 +224,7 @@ ISR(TIMER1_OVF_vect){
             break;
           case MINUTES:
             if(blink_flag == 0){
-              lcd_gotoxy(11,0);
-              lcd_puts("  ");
+              erase_time(11,0);
               blink_flag = 1;
             }
             else{
@@ -223,8 +234,7 @@ ISR(TIMER1_OVF_vect){
             break;
           case SECONDS:
             if(blink_flag == 0){
-              lcd_gotoxy(14,0);
-              lcd_puts("  ");
+              erase_time(14,0);
               blink_flag = 1;
             }
             else{
@@ -238,12 +248,9 @@ ISR(TIMER1_OVF_vect){
 
       case STOPWATCH:
         if(blink_flag == 0){
-          lcd_gotoxy(1,1);
-          lcd_puts("  ");
-          lcd_gotoxy(4,1);
-          lcd_puts("  ");
-          lcd_gotoxy(7,1);
-          lcd_puts("  ");
+          erase_time(1,1);
+          erase_time(4,1);
+          erase_time(7,1);
           blink_flag = 1;
         }
         else{
@@ -379,31 +386,23 @@ ISR(PCINT0_vect){
   if(interaction == SELECTION){
     // Move the '*' to select between Timer, Stopwatch and Clock
     if((feature == TIMER) && (joystick_direction == RIGHT)){
-      lcd_gotoxy(0,0);
-      lcd_putc(' ');
-      lcd_gotoxy(7,0);
-      lcd_putc('*');
+      erase_selector(0,0);
+      display_selector(7,0);
       feature = CLOCK;
     }
     else if((feature == TIMER) && (joystick_direction == DOWN)){
-      lcd_gotoxy(0,0);
-      lcd_putc(' ');
-      lcd_gotoxy(0,1);
-      lcd_putc('*');
+      erase_selector(0,0);
+      display_selector(0,1);
       feature = STOPWATCH;
     }
     else if((feature == CLOCK) && (joystick_direction == LEFT)){
-      lcd_gotoxy(7,0);
-      lcd_putc(' ');
-      lcd_gotoxy(0,0);
-      lcd_putc('*');
+      erase_selector(7,0);
+      display_selector(0,0);
       feature = TIMER;
     }
     else if((feature == STOPWATCH) && (joystick_direction == UP)){
-      lcd_gotoxy(0,1);
-      lcd_putc(' ');
-      lcd_gotoxy(0,0);
-      lcd_putc('*');
+      erase_selector(0,1);
+      display_selector(0,0);
       feature = TIMER;
     }
   }
