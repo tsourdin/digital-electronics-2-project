@@ -127,12 +127,12 @@ int main(){
   TIM2_overflow_16ms();
   TIM2_overflow_interrupt_enable();
 
-  // Set external interrupt INT0 on rising edge
+  // Set external interrupt INT0 on rising edge (pin PD2 - rotary encoder clock)
   EICRA |= ((1<<ISC01) | (1<<ISC00));
   // Enable external interrupt INT0
   EIMSK |= (1<<INT0);
 
-  // Set external interrupt INT1 on falling edge
+  // Set external interrupt INT1 on falling edge (pin PD3 - joystick button)
   EICRA |= (1<<ISC11); EICRA &= ~(1<<ISC10);
   // Enable external interrupt INT1
   EIMSK |= (1<<INT1); 
@@ -375,6 +375,8 @@ ISR(ADC_vect){
   }
 }
 
+// Software interrupt
+// Triggered by any change on PB4 (if a direction is detected)
 ISR(PCINT0_vect){
   // Move the '*' to select between Timer, Stopwatch and Clock
   // State machine
@@ -495,6 +497,7 @@ ISR(PCINT0_vect){
   }
 }
 
+// Triggered by a push on the joystick button (falling edge on PD3)
 ISR(INT1_vect){
   if(setting_mode == NONE) setting_mode = selection_mode;
   else{
@@ -522,6 +525,7 @@ ISR(INT1_vect){
   }
 }
 
+// Triggered by a rising edge of the rotary encoder's CLOCK output
 ISR(INT0_vect){
   uint8_t dt = GPIO_read(&PIND,PD1);
   if(setting_mode == TIMER){
@@ -580,6 +584,7 @@ ISR(INT0_vect){
   }
 }
 
+// Triggered by any change on pin PD0 (rotary encoder push button)
 ISR(PCINT2_vect){
   uint8_t data = GPIO_read(&PIND,PD0);
   if(data == 0){
