@@ -47,10 +47,6 @@ PD7: Screen D7
 /* Global Variables */
 uint16_t x;
 uint16_t y;
-/* uint8_t right_left = 0; // 0 : left | 1 : right
-uint8_t right_left_modified = 0; // flag set after modification
-uint8_t up_down = 1;  // 0 : down | 1 : up
-uint8_t up_down_modified = 0; */
 
 typedef enum {LEFT, RIGHT, DOWN, UP}direction;
 direction joystick_direction;
@@ -345,18 +341,12 @@ ISR(ADC_vect){
   if(xy_flag == 0){
     x = ADC;
     itoa(x,string,10);
-    /* uart_puts("x=");
-    uart_puts(string);
-    uart_puts("\n"); */
     xy_flag = 1;
     ADC_channel_1();
   }
   else{
     y = ADC;
     itoa(y,string,10);
-    /* uart_puts("y=");
-    uart_puts(string);
-    uart_puts("\n"); */
     xy_flag = 0;
     ADC_channel_0();
   }
@@ -368,7 +358,7 @@ ISR(ADC_vect){
     else{
       joystick_direction = DOWN;
     }
-    GPIO_write_toggle(&PORTB,PB4); // Interruption software
+    GPIO_write_toggle(&PORTB,PB4); // Software interrupt
   }
   else if((x>1013) | (y>1013)){
     if(x>y){
@@ -377,7 +367,7 @@ ISR(ADC_vect){
     else{
       joystick_direction = UP;
     } 
-    GPIO_write_toggle(&PORTB,PB4);
+    GPIO_write_toggle(&PORTB,PB4); // Software interrupt
   }
 }
 
