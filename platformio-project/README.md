@@ -8,7 +8,7 @@ We chose to implement three different features for this project : A timer, a clo
 ## Team members
 
 * Thibault Sourdin
-* Nico (I don't know your surname sorry ^^)
+* Nicolás González Mazuelos
 
 ## Hardware description
 
@@ -22,8 +22,13 @@ The rotary encoder has 2 digital outputs : CLK and DT. CLK triggers the external
 TODO : add diagram.
 
 ## Software description
+For this projects the next libraries were used:
+* [LCD](https://github.com/tsourdin/digital-electronics-2-project/tree/main/platformio-project/lib/lcd): library used for all the operations (read,write, interface settings, etc)
+* [UART](https://github.com/tsourdin/digital-electronics-2-project/tree/main/platformio-project/lib/uart): used for the communication
 
-Put flowchats of your algorithm(s). Write descriptive text of your libraries and source files. Put direct links to these files in `src` or `lib` folders.
+* [GPIO](https://github.com/tsourdin/digital-electronics-2-project/tree/main/platformio-project/lib/gpio): used for the Atmega328p input/output pins management
+* [Timer](https://github.com/tsourdin/digital-electronics-2-project/blob/main/platformio-project/include/timer.h): used for preprocessor directives related to timers 0, 1 and 2. 
+* [Adc](https://github.com/tsourdin/digital-electronics-2-project/blob/main/platformio-project/include/adc.h): used for preprocessor directives related to the analgo to digital conversor
 
 ## Video
 
