@@ -87,6 +87,8 @@ struct Stopwatch_structure{
   uint8_t tenths;
 }stopwatch_struct;
 
+/* Functions */
+
 void erase_time(uint8_t x, uint8_t y){
   lcd_gotoxy(x,y);
   lcd_puts("  ");
@@ -115,12 +117,25 @@ void display_selector(uint8_t x, uint8_t y){
 
 int main(){
 
+  timer_struct.minutes = 0;
+  timer_struct.seconds = 0;
+  timer_struct.tenths = 0;
+
+  clock_struct.hours = 0;
+  clock_struct.minutes = 0;
+  clock_struct.seconds = 0;
+  clock_struct.tenths = 0;
+
   stopwatch_struct.minutes = 0;
   stopwatch_struct.seconds = 0;
   stopwatch_struct.tenths = 0;
 
-  timer_struct.minutes = 0;
-  timer_struct.seconds = 10;
+  lcd_gotoxy(1,0);
+  lcd_puts("00:00");
+  lcd_gotoxy(8,0);
+  lcd_puts("00:00:00");
+  lcd_gotoxy(1,1);
+  lcd_puts("00:00:00");
 
   lcd_init(LCD_DISP_ON);
 
@@ -161,13 +176,6 @@ int main(){
   PCMSK2 |= (1<<PCINT16);
 
   sei();
-
-  lcd_gotoxy(1,0);
-  lcd_puts("00:00");
-  lcd_gotoxy(8,0);
-  lcd_puts("00:00:00");
-  lcd_gotoxy(1,1);
-  lcd_puts("00:00:00");
 
   while(1){}
   return 0;
@@ -408,58 +416,46 @@ ISR(PCINT0_vect){
   }
   else if(interaction == SETTING){
     if(joystick_direction == RIGHT){
-      switch(feature){
-        case TIMER:
-          if(timer_time_value == MINUTES){
-            timer_time_value = SECONDS;
-            // Make sure that the minutes were not erased by the blinking
-            display_time(timer_struct.minutes,1,0);
-          }
-          break;
-        case CLOCK:
-          switch(clock_time_value){
-            case HOURS:
-              clock_time_value = MINUTES;
-              display_time(clock_struct.hours,8,0);
-              break;
-            case MINUTES:
-              clock_time_value = SECONDS;
-              display_time(clock_struct.minutes,11,0);
-              break;
-            case SECONDS:
-              display_time(clock_struct.seconds,14,0);
+      if((feature == TIMER) && timer_time_value == MINUTES){
+        timer_time_value = SECONDS;
+        // Make sure that the minutes were not erased by the blinking
+        display_time(timer_struct.minutes,1,0);
+      }
+      else if(feature == CLOCK){
+        switch(clock_time_value){
+          case HOURS:
+            clock_time_value = MINUTES;
+            display_time(clock_struct.hours,8,0);
             break;
-          }
+          case MINUTES:
+            clock_time_value = SECONDS;
+            display_time(clock_struct.minutes,11,0);
+            break;
+          case SECONDS:
+            display_time(clock_struct.seconds,14,0);
           break;
-        case STOPWATCH:
-          break;
+        }
       }
     }
     else if(joystick_direction == LEFT){
-      switch(feature){
-        case TIMER:
-          if(timer_time_value == SECONDS){
-            timer_time_value = MINUTES;
-            display_time(timer_struct.seconds,4,0);
-          }
-          break;
-        case CLOCK:
-          switch(clock_time_value){
-            case HOURS:
-              break;
-            case MINUTES:
-              clock_time_value = HOURS;
-              display_time(clock_struct.minutes,11,0);
-              break;
-            case SECONDS:
-              clock_time_value = MINUTES;
-              display_time(clock_struct.seconds,14,0);
-              break;
-          }
-          break;
-        case STOPWATCH:
-          break;
-      }  
+      if((feature == TIMER) && (timer_time_value == SECONDS)){
+        timer_time_value = MINUTES;
+        display_time(timer_struct.seconds,4,0);
+      }
+      else if(feature == CLOCK){
+        switch(clock_time_value){
+          case HOURS:
+            break;
+          case MINUTES:
+            clock_time_value = HOURS;
+            display_time(clock_struct.minutes,11,0);
+            break;
+          case SECONDS:
+            clock_time_value = MINUTES;
+            display_time(clock_struct.seconds,14,0);
+            break;
+        }
+      }
     }
   }
 }
