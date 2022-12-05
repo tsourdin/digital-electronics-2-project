@@ -482,7 +482,11 @@ ISR(PCINT0_vect){
 
 // Triggered by a push on the joystick button (falling edge on PD3)
 ISR(INT1_vect){
-  if(interaction == SELECTION) interaction = SETTING;
+  if(interaction == SELECTION){
+    interaction = SETTING;
+    if(feature == TIMER) timer_state = DEACTIVATED;
+    else if(feature == STOPWATCH) stopwatch_state = DEACTIVATED;
+  }
   else if(interaction == SETTING){
     switch(feature){
       case TIMER:
