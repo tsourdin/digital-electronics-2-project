@@ -7,7 +7,7 @@ PB1: Screen Enable
 PB2: 
 PB3: 
 PB4: Software Interrupt pin PCINT4 (interrupt PCINT0)
-PB5: 
+PB5: Green Led on Arduino Board (Set at the end of the Timer)
 PB6: 
 PB7: 
 
@@ -55,7 +55,7 @@ typedef enum {TIMER, CLOCK, STOPWATCH}features_mode;
 features_mode feature = TIMER;
 
 typedef enum{SELECTION, SETTING}interaction_mode;
-interaction_mode interaction;
+interaction_mode interaction = SELECTION;
 
 typedef enum {ACTIVATED, DEACTIVATED}mode_state;
 mode_state timer_state = DEACTIVATED;
@@ -65,6 +65,9 @@ typedef enum {HOURS, MINUTES, SECONDS}time_value;
 time_value timer_time_value = MINUTES;
 time_value clock_time_value = HOURS;
 time_value stopwatch_time_value = MINUTES;
+
+typedef enum {OFF, BLINKING}blink_state;
+blink_state led_state = OFF;
 
 char s[4];
 
@@ -143,6 +146,7 @@ int main(){
   GPIO_mode_output(&DDRB,PB4);
   GPIO_mode_input_pullup(&DDRD,PD0);
   GPIO_mode_input_pullup(&DDRD,PD3);
+  GPIO_mode_output(&DDRB, PB5);
 
   ADC_voltage_ref_AVCC();
   ADC_channel_0();
@@ -150,8 +154,13 @@ int main(){
   ADC_enable();
   ADC_interrupt_enable();
 
+  // Timer 1 for triggering the ADC,
+  // blinking of the values on screen,
+  // and blinking of the LED when the on-screen Timer ends
   TIM1_overflow_262ms();
   TIM1_overflow_interrupt_enable();
+
+  // Timer 2 for "counting the time"
   TIM2_overflow_16ms();
   TIM2_overflow_interrupt_enable();
 
@@ -181,9 +190,9 @@ int main(){
   return 0;
 }
 
-// This timer s
 ISR(TIMER1_OVF_vect){
   static uint8_t blink_flag = 0;
+  static uint8_t led_blink_counter = 8;
   ADC_start_conversion();
   
   // If we are setting some values of one feature,
@@ -271,6 +280,18 @@ ISR(TIMER1_OVF_vect){
       // End of case STOPWATCH
     } // End of Switch mode
   }
+  // End of Timer, blink the LED
+  if(led_state == BLINKING){
+    if(led_blink_counter !=0){
+      GPIO_write_toggle(&PORTB,PB5);
+      led_blink_counter--;
+    }
+    else{
+      // Reinitialise counter and variable
+      led_blink_counter = 8;
+      led_state = OFF;
+    }
+  }
 }
 
 ISR(TIMER2_OVF_vect){
@@ -315,7 +336,12 @@ ISR(TIMER2_OVF_vect){
           timer_struct.seconds = 59;
           timer_struct.minutes--;
           if(timer_struct.minutes < 0){
-            timer_struct.minutes = 59;
+            // This means we reached the end of the programmed time
+            // We reset all the values, and blink a LED for 2 seconds
+            timer_struct.minutes = 0;
+            timer_struct.seconds = 0;
+            timer_struct.tenths = 0;
+            led_state = BLINKING;
           }
           //Display minutes after update
           display_time(timer_struct.minutes,1,0);
