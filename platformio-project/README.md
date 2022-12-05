@@ -26,7 +26,9 @@ We chose to implement three different features for this project : A timer, a clo
 
 - The rotary encoder has 2 digital outputs : CLK and DT. CLK triggers the external interrupt INT0 (on pin PD2). DT is connected to a simple GPIO (PD1). The push button is connected to PD0 and triggers the interrupt PCINT2 on pin change.
 
-TODO : add diagram.
+The following schematic shows the final electronic assembly:
+
+![](./Documentation/Hardware_schematics.png)
 
 ## Software description
 For this projects the next libraries were used:

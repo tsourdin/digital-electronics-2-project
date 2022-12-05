@@ -1,33 +1,41 @@
 # Flowcharts   
 
-Here are all the flowcharts from the functions, witha brief explanation of the functionalities of each one. Those functions are:
+To implement the different functionalities, we chose to rely exclusively on Interruption Subroutines (There is no code in the while(1) loop). Here are the flowcharts for all the interruption subroutines, with a brief explanation of what they do for each one.
 
 ### ISR(TIMER1_OVF_vect)
-When we are in setting mode (we want to set a value) this function is in charge either deleting the actual value of the LCD screen or printing the actual value on it.
+This subroutine is executed every 262ms. First, it triggers the ADC conversion. Then, when we are in setting mode (we want to set a value) this subroutine is in charge of making the value that is being set blink (that is, either erase it or print it).
 
-![](https://github.com/tsourdin/digital-electronics-2-project/blob/main/platformio-project/Documentation/timer1_ovf_vect.drawio.png)
+![](./TIMER1_OVF_vect.png)
 
 ### ISR(TIMER2_OVF_vect)
-It is used for setting the time values of the modes. The overflow occurs every 100ms.
+It is used for setting the time values of the different features/modes (Timer, Clock or Stopwatch). The overflow occurs every 100ms.
 
-![](https://github.com/tsourdin/digital-electronics-2-project/blob/main/platformio-project/Documentation/TIM2_OVF_VECT.png)
+![](./TIMER2_OVF_vect.png)
+
 ### ISR(ADC_vect)
-Based on the ADC values that are read from the joystick we define the direction that is pointing the joystick so we can move arround the modes (clock, stopwatch and timer). 
+Based on the ADC values that are read from the joystick we define the direction that the joystick is pointing so we can later move arround the modes (clock, stopwatch and timer). If a direction is detected, we trigger a software interrupt (PCINT0)
 
-![](https://github.com/tsourdin/digital-electronics-2-project/blob/main/platformio-project/Documentation/ADC_VECT.drawio.png)
+![](./ADC_vect.png)
+
 ### ISR(PCINT0_vect)
-This function calculates the next mode based on the joystick position and the actual mode.--- NO IDEA---
+This subroutine is triggered when a direction is detected.
+- If we are in mode of interraction 'SELECTION' : It computes the next mode based on the joystick direction and the actual mode, and prints the selector (*) in front of the mode.
+- If we are in mode of interraction 'SETTING' : It computes the section of the mode we are trying to set (either HOURS, MINUTES,  or SECONDS), based on the actual section of the mode selected and the joystick direction. We can't set the STOPWATCH though (because it's just a stopwatch).
 
-![](https://github.com/tsourdin/digital-electronics-2-project/blob/main/platformio-project/Documentation/PCINT0_VECT.jpeg)
+![](./PCINT0_vect.jpeg)
+
 ### ISR(INT0_vect)
-Function triggered by the rotatory encoder, it is used to change the value of a parameter ----ADD MORE INFO--
+Subroutine triggered by the clock signal of rotatory encoder, it is used to change the value of a the parameter being set. For example, if we selected the mode 'CLOCK' and then selected the hours, moving the rotary encoder clockwise will increase the hours value.
 
-![](https://github.com/tsourdin/digital-electronics-2-project/blob/main/platformio-project/Documentation/IN0_VECT.png)
+![](./INT0_vect.png)
 
 ### ISR(INT1_vect)
+This subroutine is triggered by a push on the joystick switch. It allows the program to switch between the mode of interaction 'SELECTION' (moving around the 3 features) and the mode of interaction 'SETTING' (changing the values).
 
-![](https://github.com/tsourdin/digital-electronics-2-project/blob/main/platformio-project/Documentation/INT1_VECT.drawio.png)
+![](INT1_vect.png)
+
 ### ISR(PCINT2_vect)
+This subroutine is triggered when we push or release the rotary encoder button, but we check the level to execute the usefull code only when the button is pushed (and not released). (It would have been better to create an interrupt on falling edge only, but INT0 and INT1 are already used). If we are in mode of interaction 'SELECTION', the push can start and stop the TIMER or the STOPWATCH, when they are selected. If we are in mode of interaction 'SETTING', the push will reset all the values of the mode selected.
 
-![](https://github.com/tsourdin/digital-electronics-2-project/blob/main/platformio-project/Documentation/PCINT2_VECT.drawio.png)
+![](./PCINT2_vect.png)
 
