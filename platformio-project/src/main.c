@@ -130,14 +130,14 @@ int main(){
   stopwatch_struct.seconds = 0;
   stopwatch_struct.tenths = 0;
 
+  lcd_init(LCD_DISP_ON);
+
   lcd_gotoxy(1,0);
   lcd_puts("00:00");
   lcd_gotoxy(8,0);
   lcd_puts("00:00:00");
   lcd_gotoxy(1,1);
   lcd_puts("00:00:00");
-
-  lcd_init(LCD_DISP_ON);
 
   GPIO_mode_input_nopull(&DDRD,PD1);
   GPIO_mode_output(&DDRB,PB4);
@@ -422,18 +422,13 @@ ISR(PCINT0_vect){
         display_time(timer_struct.minutes,1,0);
       }
       else if(feature == CLOCK){
-        switch(clock_time_value){
-          case HOURS:
-            clock_time_value = MINUTES;
-            display_time(clock_struct.hours,8,0);
-            break;
-          case MINUTES:
-            clock_time_value = SECONDS;
-            display_time(clock_struct.minutes,11,0);
-            break;
-          case SECONDS:
-            display_time(clock_struct.seconds,14,0);
-          break;
+        if(clock_time_value == HOURS){
+          clock_time_value = MINUTES;
+          display_time(clock_struct.hours,8,0);
+        }
+        else if(clock_time_value == MINUTES){
+          clock_time_value = SECONDS;
+          display_time(clock_struct.minutes,11,0);
         }
       }
     }
@@ -443,17 +438,13 @@ ISR(PCINT0_vect){
         display_time(timer_struct.seconds,4,0);
       }
       else if(feature == CLOCK){
-        switch(clock_time_value){
-          case HOURS:
-            break;
-          case MINUTES:
-            clock_time_value = HOURS;
-            display_time(clock_struct.minutes,11,0);
-            break;
-          case SECONDS:
-            clock_time_value = MINUTES;
-            display_time(clock_struct.seconds,14,0);
-            break;
+        if(clock_time_value == MINUTES){
+          clock_time_value = HOURS;
+          display_time(clock_struct.minutes,11,0);
+        }
+        else if(clock_time_value == SECONDS){
+          clock_time_value = MINUTES;
+          display_time(clock_struct.seconds,14,0);
         }
       }
     }
