@@ -61,10 +61,10 @@ typedef enum {ACTIVATED, DEACTIVATED}mode_state;
 mode_state timer_state = DEACTIVATED;
 mode_state stopwatch_state = DEACTIVATED;
 
-typedef enum {HOURS, MINUTES, SECONDS}time_value;
-time_value timer_time_value = MINUTES;
-time_value clock_time_value = HOURS;
-time_value stopwatch_time_value = MINUTES;
+typedef enum {HOURS, MINUTES, SECONDS}section;
+section timer_section = MINUTES;
+section clock_section = HOURS;
+section stopwatch_section = MINUTES;
 
 typedef enum {OFF, BLINKING}blink_state;
 blink_state led_state = OFF;
@@ -200,7 +200,7 @@ ISR(TIMER1_OVF_vect){
   if(interaction == SETTING){
     switch(feature){
       case TIMER:
-        switch(timer_time_value){
+        switch(timer_section){
           case HOURS:
             break;
           case MINUTES:
@@ -228,7 +228,7 @@ ISR(TIMER1_OVF_vect){
       // End of case TIMER
 
       case CLOCK:
-        switch(clock_time_value){
+        switch(clock_section){
           case HOURS:
             if(blink_flag == 0){
               erase_time(8,0);
@@ -445,34 +445,34 @@ ISR(PCINT0_vect){
   }
   else if(interaction == SETTING){
     if(joystick_direction == RIGHT){
-      if((feature == TIMER) && timer_time_value == MINUTES){
-        timer_time_value = SECONDS;
+      if((feature == TIMER) && timer_section == MINUTES){
+        timer_section = SECONDS;
         // Make sure that the minutes were not erased by the blinking
         display_time(timer_struct.minutes,1,0);
       }
       else if(feature == CLOCK){
-        if(clock_time_value == HOURS){
-          clock_time_value = MINUTES;
+        if(clock_section == HOURS){
+          clock_section = MINUTES;
           display_time(clock_struct.hours,8,0);
         }
-        else if(clock_time_value == MINUTES){
-          clock_time_value = SECONDS;
+        else if(clock_section == MINUTES){
+          clock_section = SECONDS;
           display_time(clock_struct.minutes,11,0);
         }
       }
     }
     else if(joystick_direction == LEFT){
-      if((feature == TIMER) && (timer_time_value == SECONDS)){
-        timer_time_value = MINUTES;
+      if((feature == TIMER) && (timer_section == SECONDS)){
+        timer_section = MINUTES;
         display_time(timer_struct.seconds,4,0);
       }
       else if(feature == CLOCK){
-        if(clock_time_value == MINUTES){
-          clock_time_value = HOURS;
+        if(clock_section == MINUTES){
+          clock_section = HOURS;
           display_time(clock_struct.minutes,11,0);
         }
-        else if(clock_time_value == SECONDS){
-          clock_time_value = MINUTES;
+        else if(clock_section == SECONDS){
+          clock_section = MINUTES;
           display_time(clock_struct.seconds,14,0);
         }
       }
@@ -509,7 +509,7 @@ ISR(INT0_vect){
   uint8_t dt = GPIO_read(&PIND,PD1);
   if(interaction == SETTING){
     if(feature == TIMER){
-      if(timer_time_value == MINUTES){
+      if(timer_section == MINUTES){
         if(dt == 0){
           if(timer_struct.minutes > 59) timer_struct.minutes = 0;
           else timer_struct.minutes++;
@@ -519,7 +519,7 @@ ISR(INT0_vect){
           else timer_struct.minutes--;
         }
       }
-      else if(timer_time_value == SECONDS){
+      else if(timer_section == SECONDS){
         if(dt == 0){
           if(timer_struct.seconds > 59) timer_struct.seconds = 0;
           else timer_struct.seconds++;
@@ -531,7 +531,7 @@ ISR(INT0_vect){
       }
     }
     else if(feature == CLOCK){
-      if(clock_time_value == HOURS){
+      if(clock_section == HOURS){
         if(dt == 0){
           if(clock_struct.hours > 23) clock_struct.hours = 0;
           else clock_struct.hours++;
@@ -541,7 +541,7 @@ ISR(INT0_vect){
           else clock_struct.minutes--;
         }
       }
-      else if(clock_time_value == MINUTES){
+      else if(clock_section == MINUTES){
         if(dt == 0){
           if(clock_struct.minutes > 59) clock_struct.minutes = 0;
           else clock_struct.minutes++;
@@ -551,7 +551,7 @@ ISR(INT0_vect){
           else clock_struct.minutes--;
         }
       }
-      else if(clock_time_value == SECONDS){
+      else if(clock_section == SECONDS){
         if(dt == 0){
           if(clock_struct.seconds > 59) clock_struct.seconds = 0;
           else clock_struct.seconds++;
