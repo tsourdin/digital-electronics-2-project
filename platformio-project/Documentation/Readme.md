@@ -4,6 +4,8 @@ Here are all the flowcharts from the functions, witha brief explanation of the f
 
 ### ISR(TIMER1_OVF_vect)
 When we are in setting mode (we want to set a value) this function is in charge either deleting the actual value of the LCD screen or printing the actual value on it.
+![](https://github.com/tsourdin/digital-electronics-2-project/blob/main/platformio-project/Documentation/timer1_ovf_vect.drawio.png)
+
 ### ISR(TIMER2_OVF_vect)
 It is used for setting the time values of the modes. The overflow occurs every 100ms.
 ### ISR(ADC_vect)
