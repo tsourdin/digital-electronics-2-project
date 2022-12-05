@@ -23,12 +23,12 @@ TODO : add diagram.
 
 ## Software description
 For this projects the next libraries were used:
-* [LCD](https://github.com/tsourdin/digital-electronics-2-project/tree/main/platformio-project/lib/lcd): library used for all the operations (read,write, interface settings, etc)
-* [UART](https://github.com/tsourdin/digital-electronics-2-project/tree/main/platformio-project/lib/uart): used for the communication
+* [LCD](https://github.com/tsourdin/digital-electronics-2-project/tree/main/platformio-project/lib/lcd): library used for all the operations (read,write, interface settings, etc).
+* [UART](https://github.com/tsourdin/digital-electronics-2-project/tree/main/platformio-project/lib/uart): used for the communication.
 
-* [GPIO](https://github.com/tsourdin/digital-electronics-2-project/tree/main/platformio-project/lib/gpio): used for the Atmega328p input/output pins management
+* [GPIO](https://github.com/tsourdin/digital-electronics-2-project/tree/main/platformio-project/lib/gpio): used for the Atmega328p input/output pins management.
 * [Timer](https://github.com/tsourdin/digital-electronics-2-project/blob/main/platformio-project/include/timer.h): used for preprocessor directives related to timers 0, 1 and 2. 
-* [Adc](https://github.com/tsourdin/digital-electronics-2-project/blob/main/platformio-project/include/adc.h): used for preprocessor directives related to the analgo to digital conversor
+* [Adc](https://github.com/tsourdin/digital-electronics-2-project/blob/main/platformio-project/include/adc.h): used for preprocessor directives related to the analog to digital internal conversor of the Atmega328p.
 
 ## Video
 
