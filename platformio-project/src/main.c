@@ -337,10 +337,12 @@ ISR(TIMER2_OVF_vect){
           timer_struct.minutes--;
           if(timer_struct.minutes < 0){
             // This means we reached the end of the programmed time
-            // We reset all the values, and blink a LED for 2 seconds
+            // We reset all the values, deactivate the Timer 
+            // and blink a LED for 2 seconds
             timer_struct.minutes = 0;
             timer_struct.seconds = 0;
             timer_struct.tenths = 0;
+            timer_state = DEACTIVATED;
             led_state = BLINKING;
           }
           //Display minutes after update
@@ -361,7 +363,8 @@ ISR(TIMER2_OVF_vect){
           stopwatch_struct.seconds = 0;
           stopwatch_struct.minutes++;
           if(stopwatch_struct.minutes > 59){
-            stopwatch_struct.minutes = 0;
+            stopwatch_state = DEACTIVATED;
+            // Stopwatch will print 60:00:00 and stop
           }
           //Display minutes after update
           display_time(stopwatch_struct.minutes,1,1);
@@ -583,6 +586,8 @@ ISR(PCINT2_vect){
         timer_struct.minutes = 0;
         timer_struct.seconds = 0;
         timer_struct.tenths = 0;
+        display_time(timer_struct.minutes,1,0);
+        display_time(timer_struct.seconds,4,0);
       }
       else if(feature == CLOCK){
         // Reset Clock
@@ -590,12 +595,18 @@ ISR(PCINT2_vect){
         clock_struct.minutes = 0;
         clock_struct.seconds = 0;
         clock_struct.tenths = 0;
+        display_time(clock_struct.hours,8,0);
+        display_time(clock_struct.minutes,11,0);
+        display_time(clock_struct.seconds,14,0);
       }
       else if(feature == STOPWATCH){
         // Reset Stopwatch
         stopwatch_struct.minutes = 0;
         stopwatch_struct.seconds = 0;
         stopwatch_struct.tenths  = 0;
+        display_time(stopwatch_struct.minutes,1,1);
+        display_time(stopwatch_struct.seconds,4,1);
+        display_time(stopwatch_struct.tenths,7,1);
       }
     }
   }
