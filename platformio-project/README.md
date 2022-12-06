@@ -24,7 +24,7 @@ We chose to implement three different features for this project : A timer, a clo
 
 - The joystick has 2 variable tension outputs : one for the horizontal direction (x-axis) and one for the vertical direction (y-axis). They are connected to ADC Channels 0 and 1 on the micro controller (which corresponds to PC0 and PC1) The push button is used to trigger an external interrupt and is therefore connected to the external interrupt INT1 (on pin PD3).
 
-- The rotary encoder has 2 digital outputs : CLK and DT. CLK triggers the external interrupt INT0 (on pin PD2). DT is connected to a simple GPIO (PD1). The push button is connected to PD0 and triggers the interrupt PCINT2 on pin change.
+- The rotary encoder has 2 digital outputs : CLK and DT. CLK is connected to pin PD2. DT is connected to a simple GPIO (PD1). The push button is connected to PD0 and triggers the interrupt PCINT2 on pin change.
 
 The following schematic shows the final electronic assembly:
 
