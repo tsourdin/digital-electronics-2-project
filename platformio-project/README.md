@@ -43,7 +43,7 @@ All the Interrupt Service Routines with their flowcharts are [here](./Documentat
 
 ## Video
 
-Insert a link to a short video with your practical implementation example (1-3 minutes, e.g. on YouTube).
+You can find the practical demostration [here](https://www.youtube.com/watch?v=-vp1Gv8bRH0&ab_channel=NicoGM).
 
 ## References
 
