@@ -8,7 +8,7 @@ This subroutine is executed every 262ms. First, it triggers the ADC conversion. 
 ![](./TIMER1_OVF_vect.png)
 
 ### ISR(TIMER2_OVF_vect)
-It is used for setting the time values of the different features/modes (Timer, Clock or Stopwatch). The overflow occurs every 100ms.
+It is used for setting the time values of the different features/modes (Timer, Clock or Stopwatch). The overflow occurs every 16ms.
 
 ![](./TIMER2_OVF_vect.png)
 
