@@ -22,7 +22,7 @@ This subroutine is triggered when a direction is detected.
 - If we are in mode of interraction 'SELECTION' : It computes the next mode based on the joystick direction and the actual mode, and prints the selector (*) in front of the mode.
 - If we are in mode of interraction 'SETTING' : It computes the section of the mode we are trying to set (either HOURS, MINUTES,  or SECONDS), based on the actual section of the mode selected and the joystick direction. We can't set the STOPWATCH though (because it's just a stopwatch).
 
-![](./PCINT0_vect.jpeg)
+![](./PCINT0_vect.png)
 
 ### ISR(INT0_vect) / ISR(TIMER0_vect)
 Subroutine triggered by the clock signal of rotatory encoder, it is used to change the value of a the parameter being set. For example, if we selected the mode 'CLOCK' and then selected the hours, moving the rotary encoder clockwise will increase the hours value.
