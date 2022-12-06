@@ -43,9 +43,11 @@ All the Interrupt Service Routines with their flowcharts are [here](./Documentat
 
 ## Video
 
-You can find the practical demostration [here](https://www.youtube.com/watch?v=-vp1Gv8bRH0&ab_channel=NicoGM).
+You can find the practical demonstration [here](https://www.youtube.com/watch?v=-vp1Gv8bRH0&ab_channel=NicoGM).
+The push button of the joystick doesn't work each time we press it. We figured out that it was because the rising edge is not "clear" and does some quick pulses before stabilising to a high or low level. As it triggers an interruption subroutine which switches between 2 modes, if the number of edges before stabilizing is even, the mode will stay the same ; and if it is odd, the switching will work fine.
+It would have been better to check the level on the pin at regular intervals, like a few milliseconds, rather than triggering an interruption. Actually, we had the same problem for the clock of the rotary encoder, and fixed it, but we didn't have enough time to fix the button.
 
 ## References
 
-1. Write your text here.
-2. ...
+1. [Manual for ATmega microcontrollers](https://www.microchip.com/en-us/product/ATmega328p)
+2. Previous labs
