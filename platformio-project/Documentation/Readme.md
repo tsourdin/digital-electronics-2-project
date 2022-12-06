@@ -24,10 +24,12 @@ This subroutine is triggered when a direction is detected.
 
 ![](./PCINT0_vect.jpeg)
 
-### ISR(INT0_vect)
+### ISR(INT0_vect) / ISR(TIMER0_vect)
 Subroutine triggered by the clock signal of rotatory encoder, it is used to change the value of a the parameter being set. For example, if we selected the mode 'CLOCK' and then selected the hours, moving the rotary encoder clockwise will increase the hours value.
 
 ![](./INT0_vect.png)
+
+Actually, on the last lab, we figured out that triggering an interrupt with the clock signal sometimes made the value "jump" instead of incrementing step by step. This is because the clock does some pulses before stabilizing. We fixed it by triggering the routine with a timer interrupt, each 4 millisecond, and checking the previous value of the clock to detect rising / falling edges. (See last commits)
 
 ### ISR(INT1_vect)
 This subroutine is triggered by a push on the joystick switch. It allows the program to switch between the mode of interaction 'SELECTION' (moving around the 3 features) and the mode of interaction 'SETTING' (changing the values).
