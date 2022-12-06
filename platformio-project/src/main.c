@@ -142,17 +142,28 @@ int main(){
   lcd_gotoxy(1,1);
   lcd_puts("00:00:00");
 
+  // Rotary encoder DT
   GPIO_mode_input_nopull(&DDRD,PD1);
+  // Software interrupt
   GPIO_mode_output(&DDRB,PB4);
+  // Rotary encoder switch
   GPIO_mode_input_pullup(&DDRD,PD0);
+  // Joystick switch
   GPIO_mode_input_pullup(&DDRD,PD3);
+  // Green LED on arduino board
   GPIO_mode_output(&DDRB, PB5);
+  //Rotary encoder CLK
+  GPIO_mode_input_nopull(&DDRD, PD2);
 
   ADC_voltage_ref_AVCC();
   ADC_channel_0();
   ADC_prescaler_128();
   ADC_enable();
   ADC_interrupt_enable();
+
+  // Timer 0
+  TIM0_overflow_4ms();
+  TIM0_overflow_interrupt_enable();
 
   // Timer 1 for triggering the ADC,
   // blinking of the values on screen,
@@ -164,10 +175,10 @@ int main(){
   TIM2_overflow_16ms();
   TIM2_overflow_interrupt_enable();
 
-  // Set external interrupt INT0 on rising edge (pin PD2 - rotary encoder clock)
-  EICRA |= ((1<<ISC01) | (1<<ISC00));
+  // Set external interrupt INT0 on any edge (pin PD2 - rotary encoder clock)
+  // EICRA |= (1<<ISC00); EICRA &= ~(1<<ISC01);
   // Enable external interrupt INT0
-  EIMSK |= (1<<INT0);
+  // EIMSK |= (1<<INT0);
 
   // Set external interrupt INT1 on falling edge (pin PD3 - joystick button)
   EICRA |= (1<<ISC11); EICRA &= ~(1<<ISC10);
@@ -509,65 +520,72 @@ ISR(INT1_vect){
 }
 
 // Triggered by a rising edge of the rotary encoder's CLOCK output
-ISR(INT0_vect){
+// ISR(INT0_vect)
+
+// Triggered each 4 ms
+ISR(TIMER0_OVF_vect){
+  static uint8_t previous_clk;
+  uint8_t clk = GPIO_read(&PIND,PD2);
   uint8_t dt = GPIO_read(&PIND,PD1);
-  if(interaction == SETTING){
-    if(feature == TIMER){
-      if(timer_section == MINUTES){
-        if(dt == 0){
-          if(timer_struct.minutes > 59) timer_struct.minutes = 0;
-          else timer_struct.minutes++;
+  if(clk != previous_clk){
+    if(interaction == SETTING){
+      if(feature == TIMER){
+        if(timer_section == MINUTES){
+          if(clk == dt){ // CW
+            if(timer_struct.minutes > 58) timer_struct.minutes = 0;
+            else timer_struct.minutes++;
+          }
+          else{
+            if(timer_struct.minutes < 1) timer_struct.minutes = 59;
+            else timer_struct.minutes--;
+          }
         }
-        else{
-          if(timer_struct.minutes < 1) timer_struct.minutes = 59;
-          else timer_struct.minutes--;
-        }
-      }
-      else if(timer_section == SECONDS){
-        if(dt == 0){
-          if(timer_struct.seconds > 59) timer_struct.seconds = 0;
-          else timer_struct.seconds++;
-        }
-        else{
-          if(timer_struct.seconds < 1) timer_struct.seconds = 59;
-          else timer_struct.seconds--;
-        }
-      }
-    }
-    else if(feature == CLOCK){
-      if(clock_section == HOURS){
-        if(dt == 0){
-          if(clock_struct.hours > 23) clock_struct.hours = 0;
-          else clock_struct.hours++;
-        }
-        else{
-          if(clock_struct.minutes < 1) clock_struct.minutes = 23;
-          else clock_struct.minutes--;
+        else if(timer_section == SECONDS){
+          if(clk == dt){
+            if(timer_struct.seconds > 58) timer_struct.seconds = 0;
+            else timer_struct.seconds++;
+          }
+          else{
+            if(timer_struct.seconds < 1) timer_struct.seconds = 59;
+            else timer_struct.seconds--;
+          }
         }
       }
-      else if(clock_section == MINUTES){
-        if(dt == 0){
-          if(clock_struct.minutes > 59) clock_struct.minutes = 0;
-          else clock_struct.minutes++;
+      else if(feature == CLOCK){
+        if(clock_section == HOURS){
+          if(clk == dt){
+            if(clock_struct.hours > 23) clock_struct.hours = 0;
+            else clock_struct.hours++;
+          }
+          else{
+            if(clock_struct.minutes < 1) clock_struct.minutes = 23;
+            else clock_struct.minutes--;
+          }
         }
-        else{
-          if(clock_struct.minutes < 1) clock_struct.minutes = 59;
-          else clock_struct.minutes--;
+        else if(clock_section == MINUTES){
+          if(clk == dt){
+            if(clock_struct.minutes > 58) clock_struct.minutes = 0;
+            else clock_struct.minutes++;
+          }
+          else{
+            if(clock_struct.minutes < 1) clock_struct.minutes = 59;
+            else clock_struct.minutes--;
+          }
         }
-      }
-      else if(clock_section == SECONDS){
-        if(dt == 0){
-          if(clock_struct.seconds > 59) clock_struct.seconds = 0;
-          else clock_struct.seconds++;
-        }
-        else{
-          if(clock_struct.seconds < 1) clock_struct.seconds = 59;
-          else clock_struct.seconds--;
+        else if(clock_section == SECONDS){
+          if(clk == dt){
+            if(clock_struct.seconds > 58) clock_struct.seconds = 0;
+            else clock_struct.seconds++;
+          }
+          else{
+            if(clock_struct.seconds < 1) clock_struct.seconds = 59;
+            else clock_struct.seconds--;
+          }
         }
       }
     }
   }
-  
+  previous_clk = clk;
 }
 
 // Triggered by any change on pin PD0 (rotary encoder push button)
